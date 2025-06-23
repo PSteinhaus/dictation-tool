@@ -5,31 +5,41 @@ document.getElementById('dictation-form').addEventListener('submit', function(ev
     console.log('Submitted text:', inputText);
 
     const dictactionText = transformForDictation(inputText);
+
+    document.getElementById("transformed-text").textContent = dictactionText;
 });
 
 
-const pausePerLetter = 0.2;
-const pausePerComma = 0.5;
-const pausePerPoint = 2.0;
+let pausePerLetter = 0.2;
+let pausePerComma = 0.5;
+let pausePerPoint = 2.0;
 
 function transformForDictation(textInput) {
-    if (typeof textInput !== String) {
+    console.log(typeof textInput);
+    if (typeof textInput !== "string") {
         console.error("received non text input");
         return "ERROR";
     }
     // first split the text into words
     const words = textInput.split(/\s/);
     // initialize the dictation text as an empty string
-    const dictactionText = "";
+    let dictactionText = "";
     // for each word: count the letters and create a pause to follow it, depending on the letter count
-    for (word in words) {
-        const pause = word.length * pausePerLetter;
+    for (const word of words) {
+        let pause = word.length * pausePerLetter;
         // check if it contains commas or pointation (which would lead to longer pauses)
-        if (word.indexOf(",") !== -1)
+        if (word.indexOf(",") !== -1) {
             pause += pausePerComma;
-        if (word.indexOf(".") !== -1)
+            word.replace(",","<say-as interpret-as=\"verbatim\">,</say-as>");
+        }
+        if (word.indexOf(".") !== -1) {
             pause += pausePerPoint;
-        // add the word, then the pause (and finally the explicit pointation if existent) to the dictation text
-        dictactionText += word + " "
+            word.replace(".","<say-as interpret-as=\"verbatim\">.</say-as>");
+        }
+        // add the word, then the pause
+        dictactionText += word + " <break time=\""+pause+"s\"/>";
     }
+    // finally, wrap in <speak>
+    dictactionText = "<speak>\n\t"+dictactionText+"</speak>";
+    return dictactionText;
 }

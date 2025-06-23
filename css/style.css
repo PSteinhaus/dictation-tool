@@ -1,4 +1,13 @@
+.main {
+    overflow-wrap: break-word;
+}
+
 h2 {
     font-weight: 400;
     font-size: large;
+}
+
+#transformed-text {
+    white-space: pre-wrap;    /* Allows wrapping */
+    word-break: break-word;   /* Breaks long words if needed */
 }
